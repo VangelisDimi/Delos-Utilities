@@ -2,6 +2,8 @@
 import httplib2
 from bs4 import BeautifulSoup, SoupStrainer
 import requests
+import ssl
+import certifi
 
 FILE_BASE_URL = "https://delos-media.uoa.gr:443/delosrc/resources/vl/"
 WEB_BASE_URL = "https://delos.uoa.gr/opendelos/player?rid="
@@ -33,7 +35,7 @@ def getVideoName(url):
 def getlinks(url):
 	links = []
 	names = []
-	http = httplib2.Http()
+	http = httplib2.Http(ca_certs = certifi.where())
 	status, response = http.request(url)
 	for link in BeautifulSoup(response, features="html.parser", parse_only=SoupStrainer('a')):
 		if link.has_attr('href') and 'opendelos/videolecture/show?rid' in link['href'] and (links==[] or link['href'] != links[-1]):
@@ -44,8 +46,10 @@ def getlinks(url):
 def inputLinks(input,traverse,findsr = False):
 	lectures = []
 	sr = False
+	input = input.replace(" ","")
+	links = input.splitlines()
+	print(links)
 	if not traverse:
-		links = input.splitlines()
 		for link in links:
 			if DELOS_LINK in link:
 				if VIDEO_LINK in link:
@@ -54,7 +58,6 @@ def inputLinks(input,traverse,findsr = False):
 					lectures+=getlinks(link)
 					sr = True
 	else:
-		links = input.splitlines()
 		for link in links:
 			if DELOS_LINK in link:
 				if VIDEO_LINK in link:

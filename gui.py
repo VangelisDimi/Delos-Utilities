@@ -41,7 +41,12 @@ def selectitems(lectures,type):
                     l.set(1)
                 else:
                     l.set(0)
-                print(item.get())
+            print(list(compress(a, selection())))
+        def selection():
+            selection = []
+            for item in select:
+                selection.append(item.get())
+            return selection
 
         global cl
         if (cl==None or not tk.Toplevel.winfo_exists(cl)):
@@ -74,9 +79,9 @@ def selectitems(lectures,type):
             for i in range(len(a)):
                 a[i] = getFileURL(getId(a[i]))
             if type == "p":
-                tk.Button(cl, text="Select",height=1,width=6,command= lambda: [cl.destroy(),app.textfield.delete('1.0', tk.END),createplaylist(list(compress(a, select)),list(compress(b, select)),app.dir.get("1.0",tk.END).rstrip())],bg="#5091cd").pack(anchor = 'w')
+                tk.Button(cl, text="Select",height=1,width=6,command= lambda: [cl.destroy(),app.textfield.delete('1.0', tk.END),createplaylist(list(compress(a, selection())),list(compress(b, selection())),app.dir.get("1.0",tk.END).rstrip())],bg="#5091cd").pack(anchor = 'w')
             elif type=="gl":
-                tk.Button(cl, text="Select",height=1,width=6,command= lambda: [cl.destroy(),app.textfield.delete('1.0', tk.END),printlinks(list(compress(a, select)))],bg="#5091cd").pack(anchor = 'w')
+                tk.Button(cl, text="Select",height=1,width=6,command= lambda: [cl.destroy(),app.textfield.delete('1.0', tk.END),printlinks(list(compress(a, selection())))],bg="#5091cd").pack(anchor = 'w')
 
 def guicreateplaylist():
     global pl
@@ -151,17 +156,17 @@ def getvideolinks():
         else:
             result = False
             try:
-                loading = createloading()
-                with ProcessPool() as pool:
-                    future = pool.schedule(inputLinks, args=[input,app.Traverse.get(),True])
-                    while not future.done():
-                        loading.update()
-                        if not  tk.Toplevel.winfo_exists(loading):
-                            future.cancel()
-                            return
-                        sleep(0.001)
-                    result = future.result()
-                loading.destroy()
+	            loading = createloading()
+	            with ProcessPool() as pool:
+	                future = pool.schedule(inputLinks, args=[input,app.Traverse.get(),True])
+	                while not future.done():
+	                    loading.update()
+	                    if not  tk.Toplevel.winfo_exists(loading):
+	                        future.cancel()
+	                        return
+	                    sleep(0.001)
+	                result = future.result()
+	            loading.destroy()
             except:
                 messagebox.showerror("Error", "Invalid Link(s)")
                 loading.destroy()
