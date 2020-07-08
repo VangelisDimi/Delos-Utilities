@@ -1,0 +1,9 @@
+		<track>
+			<location>%s</location>
+			<title>%s</title>
+			<duration>3600195</duration>
+			<extension application="http://www.videolan.org/vlc/playlist/0">
+				<vlc:id>%s</vlc:id>
+				<vlc:option>network-caching=1000</vlc:option>
+			</extension>
+		</track>

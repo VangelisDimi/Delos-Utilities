@@ -1,0 +1,2 @@
+	</trackList>
+	<extension application="http://www.videolan.org/vlc/playlist/0">
