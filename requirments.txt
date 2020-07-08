@@ -3,3 +3,4 @@ tkinter
 requests
 pebble
 httlib2
+certifi
