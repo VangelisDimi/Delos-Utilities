@@ -2,7 +2,7 @@
 import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter import filedialog
-from tkinter import scrolledtext 
+from tkinter import scrolledtext
 from tkinter import messagebox
 from itertools import compress
 import os
@@ -22,6 +22,7 @@ cl = None
 loading = None
 pl = None
 
+
 def createloading():
     winimg = tk.PhotoImage(file=resource_path('./Assets/uoa_logo.png'))
     lw = tk.Toplevel(app)
@@ -33,20 +34,22 @@ def createloading():
     lw.Label.pack()
     return lw
 
-def selectitems(lectures,type):
-        def select_all():
-            for item in select:
-                l = item
-                if sa.get():
-                    l.set(1)
-                else:
-                    l.set(0)
-            print(list(compress(a, selection())))
-        def selection():
-            selection = []
-            for item in select:
-                selection.append(item.get())
-            return selection
+
+def selectitems(lectures, type):
+    def select_all():
+        for item in select:
+            l = item
+            if sa.get():
+                l.set(1)
+            else:
+                l.set(0)
+        print(list(compress(a, selection())))
+
+    def selection():
+        selection = []
+        for item in select:
+            selection.append(item.get())
+        return selection
 
         global cl
         if (cl==None or not tk.Toplevel.winfo_exists(cl)):
@@ -87,14 +90,16 @@ def guicreateplaylist():
     global pl
     global loading
     global cl
-    if(cl == None or not tk.Toplevel.winfo_exists(cl)) and (loading == None or not tk.Toplevel.winfo_exists(loading)) and (pl==None or not tk.Toplevel.winfo_exists(pl)):
+    if (cl == None or not tk.Toplevel.winfo_exists(cl)) and (
+            loading == None or not tk.Toplevel.winfo_exists(loading)) and (
+            pl == None or not tk.Toplevel.winfo_exists(pl)):
         input = app.textfield.get('1.0', 'end-1c')
-        directory=app.dir.get("1.0",tk.END).rstrip()
-        #Invalid directory
+        directory = app.dir.get("1.0", tk.END).rstrip()
+        # Invalid directory
         if not os.path.isdir(directory):
             messagebox.showerror("Error", "Invalid Directory")
             return
-        #No links
+        # No links
         if input == "":
             return
         else:
@@ -102,10 +107,10 @@ def guicreateplaylist():
             try:
                 loading = createloading()
                 with ProcessPool() as pool:
-                    future = pool.schedule(inputLinks, args=[input,app.Traverse.get()])
+                    future = pool.schedule(inputLinks, args=[input, app.Traverse.get()])
                     while not future.done():
                         loading.update()
-                        if not  tk.Toplevel.winfo_exists(loading):
+                        if not tk.Toplevel.winfo_exists(loading):
                             future.cancel()
                             return
                         sleep(0.001)
@@ -115,12 +120,13 @@ def guicreateplaylist():
                 messagebox.showerror("Error", "Invalid Link(s)")
                 loading.destroy()
                 return
-            if result: 
-                f = open(resource_path("./Memory/playlist_dir.txt"),'r+')
+            if result:
+                f = open(resource_path("./Memory/playlist_dir.txt"), 'r+')
                 f.truncate(0)
                 f.write(directory)
                 f.close()
-                selectitems(result,"p")
+                selectitems(result, "p")
+
 
 def browse():
     dir = filedialog.askdirectory()
@@ -128,20 +134,21 @@ def browse():
         app.dir.delete('1.0', tk.END)
         app.dir.insert('1.0', dir)
 
+
 def printlinks(links):
     global pl
     pl = tk.Toplevel(app)
     pl.title("Video Links")
     img = tk.PhotoImage(file=resource_path('./Assets/uoa_logo.png'))
     pl.tk.call('wm', 'iconphoto', pl._w, img)
-    sb = tk.Scrollbar(pl,orient="vertical")
+    sb = tk.Scrollbar(pl, orient="vertical")
     text = tk.Text(pl, width=40, height=20, yscrollcommand=sb.set)
     sb.config(command=text.yview)
-    sb.pack(side="right",fill="y")
-    text.pack(side="top",fill="both",expand=True)
+    sb.pack(side="right", fill="y")
+    text.pack(side="top", fill="both", expand=True)
 
     for link in links:
-        text.insert('1.0',link + "\n")
+        text.insert('1.0', link + "\n")
 
 
 def getvideolinks():
@@ -156,63 +163,68 @@ def getvideolinks():
         else:
             result = False
             try:
-	            loading = createloading()
-	            with ProcessPool() as pool:
-	                future = pool.schedule(inputLinks, args=[input,app.Traverse.get(),True])
-	                while not future.done():
-	                    loading.update()
-	                    if not  tk.Toplevel.winfo_exists(loading):
-	                        future.cancel()
-	                        return
-	                    sleep(0.001)
-	                result = future.result()
-	            loading.destroy()
+                loading = createloading()
+                with ProcessPool() as pool:
+                    future = pool.schedule(inputLinks, args=[input, app.Traverse.get(), True])
+                    while not future.done():
+                        loading.update()
+                        if not tk.Toplevel.winfo_exists(loading):
+                            future.cancel()
+                            return
+                        sleep(0.001)
+                    result = future.result()
+                loading.destroy()
             except:
                 messagebox.showerror("Error", "Invalid Link(s)")
                 loading.destroy()
                 return
             if result[1]:
                 app.textfield.delete('1.0', tk.END)
-                selectitems(result[0],"gl")
+                selectitems(result[0], type)
             elif result[0]:
                 app.textfield.delete('1.0', tk.END)
-                a,b = result
-                z,x =zip(*a)
+                a, b = result
+                z, x = zip(*a)
                 z = list(z)
                 for i in range(len(z)):
                     z[i] = getFileURL(getId(z[i]))
                 printlinks(z)
 
+
 def renamedownloaded():
     global pl
     global loading
     global cl
-    if(cl == None or not tk.Toplevel.winfo_exists(cl)) and (loading == None or not tk.Toplevel.winfo_exists(loading)) and (pl==None or not tk.Toplevel.winfo_exists(pl)):
-        files = filedialog.askopenfilenames(parent=app,title='Choose a file')
+    if (cl == None or not tk.Toplevel.winfo_exists(cl)) and (
+            loading == None or not tk.Toplevel.winfo_exists(loading)) and (
+            pl == None or not tk.Toplevel.winfo_exists(pl)):
+        files = filedialog.askopenfilenames(parent=app, title='Choose a file')
         files = list(files)
         loading = createloading()
         with ProcessPool() as pool:
             future = pool.schedule(renamefiles, args=[files])
             while not future.done():
                 loading.update()
-                if not  tk.Toplevel.winfo_exists(loading):
+                if not tk.Toplevel.winfo_exists(loading):
                     future.cancel()
                     return
                 sleep(0.001)
         loading.destroy()
 
+
 if __name__ == "__main__":
     multiprocessing.freeze_support()
-    #Window
+    # Window
     app = tk.Tk()
     app.title("Delos Utilities")
     winimg = tk.PhotoImage(file=resource_path('./Assets/uoa_logo.png'))
     app.tk.call('wm', 'iconphoto', app._w, winimg)
 
-    #Options
+    # Options
     app.Traverse = tk.IntVar()
     app.Traverse.set(0)
-    ttk.Checkbutton(app,text="Include all search pages",variable=app.Traverse).grid(row=0,column=0,sticky=tk.W)
+    ttk.Checkbutton(app, text="Include all search pages", variable=app.Traverse).grid(row=0, column=0, sticky=tk.W)
+
     rnmimg = tk.PhotoImage(file=resource_path('./Assets/renameicon.png'))
     app.rename = tk.Button(app, text="Rename downloaded files",image=rnmimg,height=40,width=48,command=renamedownloaded,bg="#5091cd",anchor="center")
     CreateToolTip(app.rename,"Rename downloaded files")
@@ -220,11 +232,11 @@ if __name__ == "__main__":
 
 
 
-    #Links Field
+    # Links Field
     app.textfield = scrolledtext.ScrolledText(app, wrap=tk.WORD)
-    app.textfield.grid(row=1,column=0,columnspan=4,rowspan=2,sticky=tk.NSEW)
+    app.textfield.grid(row=1, column=0, columnspan=4, rowspan=2, sticky=tk.NSEW)
 
-    #Add Links
+    # Add Links
     app.buttonframe = tk.Frame(app)
     app.buttonframe.grid(row=3, column=0, columnspan=1,sticky=tk.W)
     listimg = tk.PhotoImage(file=resource_path('./Assets/playlist.png'))
@@ -239,14 +251,14 @@ if __name__ == "__main__":
 
     #Save directory for playlist
     app.browseframe = tk.Frame(app)
-    app.browseframe.grid(row=3, column=3, columnspan=1,sticky=tk.E)
-    tk.Label(app.browseframe, text="Save directory:").grid(row=2,column=2)
-    app.dir = tk.Text(app.browseframe,height=1,width=35,wrap=tk.WORD)
-    f = open(resource_path("./Memory/playlist_dir.txt"),'r')
+    app.browseframe.grid(row=3, column=3, columnspan=1, sticky=tk.E)
+    tk.Label(app.browseframe, text="Save directory:").grid(row=2, column=2)
+    app.dir = tk.Text(app.browseframe, height=1, width=35, wrap=tk.WORD)
+    f = open(resource_path("./Memory/playlist_dir.txt"), 'r')
     app.dir.insert('1.0', f.readline())
     f.close()
-    app.dir.grid(row=3,column=2,sticky=tk.E)
-    ttk.Button(app.browseframe, text="Browse",command=browse).grid(row=3,column=3,sticky=tk.E)
+    app.dir.grid(row=3, column=2, sticky=tk.E)
+    ttk.Button(app.browseframe, text="Browse", command=browse).grid(row=3, column=3, sticky=tk.E)
 
     app.grid_columnconfigure(0, weight=1)
     app.grid_columnconfigure(1, weight=1)
@@ -256,5 +268,5 @@ if __name__ == "__main__":
     app.rowconfigure(1, weight=1)
     app.rowconfigure(2, weight=1)
     app.rowconfigure(3, weight=1)
-            
+
     app.mainloop()
